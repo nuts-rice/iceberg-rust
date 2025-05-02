@@ -70,7 +70,7 @@ jobs:
         with:
           tool: cargo-machete
       - name: Cargo Machete
-        run: cargo machete
+        run: cargo machete      
 
   build:
     runs-on: ${{ matrix.os }}
@@ -130,6 +130,8 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: ./.github/actions/setup-builder
+      
+      
 
       - name: Cache Rust artifacts
         uses: Swatinem/rust-cache@v2
@@ -160,3 +162,19 @@ jobs:
       - name: Check MSRV
         run: |
           cargo +${{ env.rust_msrv }} check --locked --workspace
+
+  miri:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Nightly Rust Toolchain
+        uses: ./.github/actions/setup-builder
+      - name: Install miri and setup
+        run: |
+          rustup +nightly component add miri
+          cargo +nightly miri setup
+      - name: Miri test    
+        run: cargo +nightly miri test --no-fail-fast --release --all-target --all-features --workspace
+
+
