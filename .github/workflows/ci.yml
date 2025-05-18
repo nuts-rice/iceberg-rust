@@ -174,7 +174,11 @@ jobs:
         run: |
           rustup +nightly component add miri
           cargo +nightly miri setup
+      - name: Install measureme + flamegraph
+        run: |
+          cargo install --git https://github.com/rust-lang/measureme --branch stable flamegraph
       - name: Miri test    
-        run: cargo +nightly miri test --no-fail-fast --release --all-target --all-features --workspace
+        run: |
+          MIRIFLAGS="-Zmiri-disable-isolation -Zmiri-measureme=flamegraph" cargo +nightly miri test --no-fail-fast --release --all-target --all-features --workspace
 
 
